@@ -1,36 +1,17 @@
-import json
+import checking_correct_data, values
 from datetime import datetime
 
-import checking_correct_data
 
-
-def print_dict_keys_and_values(some_tuple, start=1):
-    for point, action in enumerate(some_tuple, start):
-        print(f'{point}: {action}')
-
-
-def read_from_json(name_and_path):
-    file = open(name_and_path, 'r', encoding='UTF-8')
-    dictionary = json.load(file)
-    file.close()
-    return dictionary
-
-
-def write_in_json(name_and_path, dictionary):
-    with open(name_and_path, 'w+', encoding='UTF-8') as file:
-        json.dump(dictionary, file, ensure_ascii=False, indent=4)
-
-
-def write_dict_results(category, dictionary, list_with_data):
-    d, m, y = list(map(str, list_with_data))
+def write_desc_in_dict(category, dictionary, list_with_data):
+    d, m, y = map(str, list_with_data)
 
     choise = [r for r in input('Что? ').split()]
-
+    if '0' in choise:
+        return False
     if checking_correct_data.check_correct_input(category, choise):
 
         for r in sorted(choise):
-            if r == '0':
-                break
+
             input_info = input(f'{category[int(r) - 1]}: ').replace('\т', '\n')
             dictionary[y][m][d].setdefault(category[int(r) - 1], {})
             # такой подход необходим, чтобы сделать записи с привязкой ко времени
@@ -39,31 +20,28 @@ def write_dict_results(category, dictionary, list_with_data):
             data = now_time.strftime('%d/%m/%Y, %H:%M:%S')
             dictionary[y][m][d][category[int(r) - 1]].setdefault(data, input_info)
     else:
-        write_dict_results(category, dictionary, list_with_data)
+        write_desc_in_dict(category, dictionary, list_with_data)
 
 
 def add_info_in_description(name_and_path, category_description):
-    dictionary = read_from_json(name_and_path)
+    dictionary = values.read_from_json(name_and_path)
 
     chosen_data = input('дата на добавление:  ').split()
     chosen_data[2] = '20' + chosen_data[2]
 
     checking_correct_data.create_day_in_dictionary(dictionary, chosen_data)
-    print_dict_keys_and_values(category_description)
-    write_dict_results(category_description, dictionary, chosen_data)
+    values.print_dict_keys_and_values(category_description)
+    write_desc_in_dict(category_description, dictionary, chosen_data)
 
-    write_in_json(name_and_path, dictionary)
+    values.write_in_json(name_and_path, dictionary)
 
 
 def show_me_data_description(list_with_data, description_path, numberic_mouths_dict, default_mouths_dict):
-    print('\033[41m\033[30mпоказать данные:\033[0m')
-    category = ('за сегодня',
-                'за определенный день/месяц',
-                'за диапазон (xx.xx.xxxx xx.xx.xxxx)',
-                'выйти в главное меню'
-                )
-    print_dict_keys_and_values(category)
-    dictionary = read_from_json(description_path)
+    print(f'{values.BG_white}показать данные:{values.reset_style}')
+
+    values.print_dict_keys_and_values(values.category, start_enumerate=0)
+
+    dictionary = values.read_from_json(description_path)
     action = input('Что?  ')
     print()
     try:
@@ -89,7 +67,7 @@ def show_me_data_description(list_with_data, description_path, numberic_mouths_d
             case 0:
                 raise TypeError
     except TypeError:
-        None
+        return  False
 
 
 def print_description_stat_moth(list_with_data, dictionary, numberic_mouths_dict, default_mouths_dict):
@@ -135,7 +113,7 @@ def print_one_day_description(list_with_data, dictionary, numberic_mouths_dict):
                 print(f'\033[4m{exact_time_writing}\033[0m')
                 print(f'{dictionary[some_year][some_month][some_day][action][date_in_note]}')
                 print()
-        print('-' * 23)
+        print(values.print_line)
 
 
 def print_description_stat_in_range(dictionary, default_mouths_dict, numberic_mouths_dict, a):
@@ -206,7 +184,7 @@ def fill_train_diary(dictionary, list_with_data):
         dictionary[str(y)][str(m)][str(d)].setdefault('работа', workout)
 
         print('где была тренировка?  ')
-        print_dict_keys_and_values(places_to_train, start=1)
+        values.print_dict_keys_and_values(places_to_train)
         choose_where_was_train = int(input())
         where_was_train = places_to_train[choose_where_was_train]
 

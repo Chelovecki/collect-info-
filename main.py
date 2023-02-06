@@ -1,103 +1,74 @@
-import os.path
+import os.path, values
 
-from work_with_description import write_dict_results, show_me_data_description, fill_train_diary
+from work_with_description import write_desc_in_dict, show_me_data_description, fill_train_diary
 
 from work_with_habits import note_habits_results, show_me_data_habit, add_info_in_habits
 
-import time, json
-import checking_correct_data
+import time, checking_correct_data
 
 
-# эта функция нужна, чтобы достать словарик из файла
-def read_from_json(name_and_path):
-    file = open(name_and_path, 'r', encoding='UTF-8')
-    dictionary = json.load(file)
-    file.close()
-    return dictionary
 
 
-# эта функция нужна, чтобы занести словарик в файл
-def write_in_json(name_and_path, dictionary):
-    with open(name_and_path, 'w+', encoding='UTF-8') as file:
-        json.dump(dictionary, file, ensure_ascii=False, indent=4)
-
-
-# эта функция нужна, чтобы вывести все доступные действия
-def print_dict_keys_and_values(tuple):
-    for point, action in enumerate(tuple, 1):
-        print(f'{point}: {action}')
-
-
-def mainMenu(list_with_some_data):
-    print('-' * 23)
-    print('\033[30m\033[41mГЛАВНОЕ МЕНЮ\033[0m')
-    functional_desc = ('трекер привычек',
+def main_menu(list_with_some_data):
+    print(values.print_line)
+    print(f'{values.BG_red}ГЛАВНОЕ МЕНЮ{values.reset_style}')
+    # этот пункт я не стал засовывать в values.py, потому что он относится к программным.
+    # а не к тому, что можно (и следует) менять/добавлять пользователю
+    functional_desc = ('выйти из программы',
+                       'трекер привычек',
                        'тренировочный дневник',
                        'описание дня',
                        'дополнить данные',
                        'вывести данные на экран',
-                       'выйти из программы',
                        )
 
-    print_dict_keys_and_values(functional_desc)
+    values.print_dict_keys_and_values(functional_desc, start_enumerate=0)
 
     chose = input('Что выбираем?  ')
-    print('-' * 23)
+    print(values.print_line)
 
     match chose:
         # вызываем заполнение трекера привычек
         case '1':
-            write_habits_day(name_and_path_habits=habit_path,
-                             category_habits=category_habits, list_with_some_data=list_with_current_data)
+            write_habits_day(habit_path, values.category_habits, list_with_current_data)
 
         # вызываем заполнение тренировочного дневника
         case '2':
-            write_train_diary_day(name_and_path_diary=train_dairy_path,
-                                  list_with_some_data=list_with_current_data)
+            write_train_diary_day(train_dairy_path, list_with_current_data)
 
         # вызываем заполнение итогов дня
         case '3':
-            write_description_day(name_and_path_description=description_path,
-                                  category_description=category_descripton,
-                                  list_with_some_data=list_with_current_data)
+            write_description_day(description_path, values.category_descripton, list_with_current_data)
 
         # добавление данных на какой-то определенный день по привычкам\спорт дневнику\итогам дня
         case '4':
-            print_dict_keys_and_values(functional_desc[:3])
+            values.print_dict_keys_and_values(functional_desc[:3])
             choise = input('куда добавим данные?  ')
             match choise:
                 case '1':
-                    write_habits_day(name_and_path_habits=habit_path,
-                                     category_habits=category_habits,
-                                     list_with_some_data=write_data_for_adding())
+                    write_habits_day(habit_path, values.category_habits, write_data_for_adding())
                 case '2':
-                    write_train_diary_day(name_and_path_diary=train_dairy_path,
-                                          list_with_some_data=write_data_for_adding())
+                    write_train_diary_day(train_dairy_path, write_data_for_adding())
 
                 case '3':
-                    write_description_day(name_and_path_description=description_path,
-                                          category_description=category_descripton,
-                                          list_with_some_data=write_data_for_adding())
+                    write_description_day(description_path, values.category_descripton, write_data_for_adding())
 
-        # вызываем ouput data (челлендж или итоги дня)
+        # вызываем output data (челлендж или итоги дня)
         case '5':
-            print('Что показывать? 1 - челлендж-лист, 2 - итоги дня')
+            print('Что показывать? 1 - челлендж-лист, 2 - итоги дня (0, чтобы вернуться)')
             a = input()
 
             if a == '1':
                 show_me_data_habit(list_with_current_data, habit_path, default_mouths_dict, numerated_mouths_dict)
 
             elif a == '2':
-                show_me_data_description(list_with_data=list_with_current_data,
-                                         description_path=description_path,
-                                         numberic_mouths_dict=numerated_mouths_dict,
-                                         default_mouths_dict=default_mouths_dict)
+                show_me_data_description(list_with_current_data, description_path, numerated_mouths_dict, default_mouths_dict)
 
         # а это очень важная фишка на случай, если я захочу вручную закрыть программу, а не просто ее вырубить с локтя
         case '0':
-            raise TypeError('ты вышел из меню')
+            exit()
 
-    mainMenu(list_with_some_data)
+    main_menu(list_with_some_data)
 
 
 def write_data_for_adding():
@@ -113,27 +84,27 @@ def write_data_for_adding():
 
 def write_description_day(name_and_path_description, category_description, list_with_some_data):
     # получаем словарик
-    dictionary = read_from_json(name_and_path_description)
+    dictionary = values.read_from_json(name_and_path_description)
 
     # если нет текущей даты, то добавляем ее в словарь
     checking_correct_data.create_day_in_dictionary(dictionary, list_with_some_data)
 
     # показываем все доступные movements для этой категории
-    print_dict_keys_and_values(category_description)
+    values.print_dict_keys_and_values(category_description, start_enumerate=0)
 
     # вызываем функцию для записи данных в словарик
-    write_dict_results(category_description, dictionary, list_with_some_data)
+    write_desc_in_dict(category_description, dictionary, list_with_some_data)
 
     # все это заносим в файл
-    write_in_json(name_and_path_description, dictionary)
+    values.write_in_json(name_and_path_description, dictionary)
 
     # возвращаемся в главное меню
-    mainMenu(list_with_some_data)
+    main_menu(list_with_some_data)
 
 
 def write_train_diary_day(name_and_path_diary, list_with_some_data):
     # получаем словарик
-    dictionary = read_from_json(name_and_path_diary)
+    dictionary = values.read_from_json(name_and_path_diary)
 
     # если нет текущей даты, то добавляем ее в словарь
     checking_correct_data.create_day_in_dictionary(dictionary, list_with_some_data)
@@ -142,24 +113,24 @@ def write_train_diary_day(name_and_path_diary, list_with_some_data):
     fill_train_diary(dictionary, list_with_some_data)
 
     # все это заносим в файл
-    write_in_json(name_and_path_diary, dictionary)
+    values.write_in_json(name_and_path_diary, dictionary)
 
 
 def write_habits_day(name_and_path_habits, category_habits, list_with_some_data):
     # получаем словарик
-    dictionary = read_from_json(name_and_path_habits)
+    dictionary = values.read_from_json(name_and_path_habits)
 
     # если нет текущей даты, то добавляем ее в словарь
     checking_correct_data.create_day_in_dictionary(dictionary, list_with_some_data)
 
     # показываем все доступные movements для этой категории
-    print_dict_keys_and_values(category_habits)
+    values.print_dict_keys_and_values(values.category_habits, start_enumerate=0)
 
     # вызываем функцию для записи данных в словарик
-    note_habits_results(category_habits, dictionary, list_with_some_data)
+    note_habits_results(values.category_habits, dictionary, list_with_some_data)
 
     # все это заносим в файл
-    write_in_json(name_and_path_habits, dictionary)
+    values.write_in_json(name_and_path_habits, dictionary)
 
 
 local_time = time.localtime()
@@ -169,30 +140,12 @@ today = str(local_time.tm_mday)
 list_with_current_data = [today, month, year]
 
 description_path = os.path.abspath(os.path.join('..', 'итоги дня.json'))
+print(description_path)
 habit_path = os.path.abspath(os.path.join('..', 'трекер привычек.json'))
 train_dairy_path = os.path.abspath(os.path.join('..', 'спортивный дневник.json'))
 
-category_descripton = ('фактики',
-                       'учеба',
-                       'треня',
-                       'люди',
-                       'мысли...',
-                       'сон',
-                       'отношения'
-                       )
-category_habits = ('ложиться спать до 22 (+-30мин)',
-                   'skillbox',
-                   'НЕ кофе',
-                   'НЕ игры',
-                   'треня',
-                   'читать',
-                   'писать итоги дня',
-                   'ПДД',
-                   'не покупать вкусняшки',
-                   'говорить с людьми',
-                   'держать спину прямо',
-                   'выйти в главное меню'
-                   )
+
+
 
 numerated_mouths_dict = {1: 'января',
                          2: 'февраля',
@@ -229,5 +182,5 @@ print(
     'то есть, если хочешь написать итоги дня за вчера, '
     'тебе надо написать "33"')
 while True:
-    if not mainMenu(list_with_current_data):
+    if not main_menu(list_with_current_data):
         break

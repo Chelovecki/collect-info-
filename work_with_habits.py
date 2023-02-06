@@ -1,22 +1,4 @@
-import checking_correct_data
-import json
-
-
-def print_dict_keys_and_values(data_tuple):
-    for point, action in enumerate(data_tuple, 1):
-        print(f'{point}: {action}')
-
-
-def read_from_json(name_and_path):
-    file = open(name_and_path, 'r', encoding='UTF-8')
-    dictionary = json.load(file)
-    file.close()
-    return dictionary
-
-
-def write_in_json(name_and_path, dictionary):
-    with open(name_and_path, 'w+', encoding='UTF-8') as file:
-        json.dump(dictionary, file, ensure_ascii=False, indent=4)
+import checking_correct_data, values
 
 
 def note_habits_results(category, dictionary, list_with_data):
@@ -38,31 +20,28 @@ def note_habits_results(category, dictionary, list_with_data):
 
 
 def add_info_in_habits(name_and_path, some_category):
-    dictionary = read_from_json(name_and_path)
+    dictionary = values.read_from_json(name_and_path)
 
     chosen_data = input('дата на добавление:  ').split()
     chosen_data[2] = '20' + chosen_data[2]
 
     checking_correct_data.create_day_in_dictionary(dictionary, chosen_data)
 
-    print_dict_keys_and_values(some_category)
+    values.print_dict_keys_and_values(some_category)
     note_habits_results(some_category, dictionary, chosen_data)
 
-    write_in_json(name_and_path, dictionary)
+    values.write_in_json(name_and_path, dictionary)
 
 
 def show_me_data_habit(list_with_data,
                        habit_path,
                        default_mouths_dict,
                        numbered_mouths_dict):
-    print('\033[41m\033[30mпоказать данные:\033[0m')
-    category = ('за сегодня',
-                'за определенную дату',
-                'за диапазон (begin-dd.mm.yyyy end-dd.mm.yyyy)',
-                'выйти в главное меню'
-                )
-    print_dict_keys_and_values(category)
-    dictionary = read_from_json(habit_path)
+    print(f'{values.BG_white}показать данные:{values.reset_style}')
+
+    values.print_dict_keys_and_values(values.category, start_enumerate=0)
+
+    dictionary = values.read_from_json(habit_path)
     action = input('Что?  ')
     print()
     try:
@@ -103,7 +82,7 @@ def print_habits_stat_moth(list_with_data, dictionary, numberic_mouths_dict, def
         if some_month in dictionary[some_year].keys():
             # тут мы пишем название месяца большими буквами
             print(f'{default_mouths_dict[int(some_month)].upper()}')
-            print('-' * 23)
+            print(values.print_line)
             # чтобы все дни шли по порядку!
             days_for_mouth = sorted([int(r) for r in dictionary[some_year][some_month].keys()])
             for some_day in days_for_mouth:

@@ -1,16 +1,3 @@
-import json
-
-
-def read_from_json(name_and_path):
-    filel = open(name_and_path, 'r', encoding='UTF-8')
-    dictionary = json.load(filel)
-    filel.close()
-    return dictionary
-
-
-def write_in_json(name_and_path, dictionary):
-    with open(name_and_path, 'w', encoding='UTF-8') as file:
-        json.dump(dictionary, file, ensure_ascii=False, indent=4)
 
 
 def create_day_in_dictionary(dictionary, list_with_data):
