@@ -139,10 +139,9 @@ month = str(local_time.tm_mon)
 today = str(local_time.tm_mday)
 list_with_current_data = [today, month, year]
 
-description_path = os.path.abspath(os.path.join('..', 'итоги дня.json'))
-print(description_path)
-habit_path = os.path.abspath(os.path.join('..', 'трекер привычек.json'))
-train_dairy_path = os.path.abspath(os.path.join('..', 'спортивный дневник.json'))
+description_path = os.path.abspath(os.path.join('jsons\итоги дня.json'))
+habit_path = os.path.abspath(os.path.join('jsons\трекер привычек.json'))
+train_dairy_path = os.path.abspath(os.path.join('jsons\спортивный дневник.json'))
 
 
 
